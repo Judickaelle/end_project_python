@@ -9,7 +9,7 @@ import time
 #-----------------------------------------------------
 class Memory:
     def memoryMenu(self):
-        print("-----------------   Memory menu   -----------------")
+        print("\n-----------------   Memory menu   -----------------")
         valideChoice = False
         #the user will be asked to choose what memory game he wants to play 
         while(not valideChoice):
@@ -20,8 +20,7 @@ class Memory:
                 \n3- Go back\
                 \n4- Quit\
                 \n\nPlease enter your choice number : "))
-                valideChoice = (memoryMenuChoice == 1 or memoryMenuChoice == 2 
-                    or memoryMenuChoice == 3 or memoryMenuChoice == 4)
+                valideChoice = (1 <= mainMenuChoice <= 4)
                 if not valideChoice:
                     print("\nThe item you choosen does not exist")
                     time.sleep(1)
@@ -48,7 +47,7 @@ class Memory:
 
 #-----------------mainMenu function-------------------
 def mainMenu() :
-    print("-------------------   Main menu   -------------------")
+    print("\n-------------------   Main menu   -------------------")
     valideChoice = False
     #the user will be asked to choose what he wants to do 
     while(not valideChoice):
@@ -58,7 +57,7 @@ def mainMenu() :
             \n2- Statistic\
             \n3- Quit\
             \n\nPlease enter your choice number : "))
-            valideChoice = (mainMenuChoice == 1 or mainMenuChoice == 2 or mainMenuChoice == 3)
+            valideChoice = (1 <= mainMenuChoice <= 3)
             if not valideChoice:
                     print("\nThe item you choosen does not exist")
                     time.sleep(1)
