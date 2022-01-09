@@ -5,12 +5,12 @@
 import time
 import random
 
-import string
-
 
 # -----------------------------------------------------
-#                      CLASS MEMORY
+#                      CLASS
 # -----------------------------------------------------
+
+# ----------   CLASS FOR MEMORY   ----------
 class Card:
     nCard = 0
 
@@ -18,16 +18,16 @@ class Card:
         self._find = 0
         Card.nCard += 1
 
-    def Setfind(self, find):
+    def SetFind(self, find):
         self._find = find
 
-    def Getfind(self):
+    def GetFind(self):
         return self._find
 
-    def Getsymbol(self):
+    def GetSymbol(self):
         return self._symbol
 
-    def GetsymbolN(self, n):
+    def GetSymbolN(self, n):
         return self._symbol[n]
 
 
@@ -40,17 +40,18 @@ class DeckCard(Card):
         else:
             self._color = "black"
 
-    def Getcouleur(self):
+    def GetCouleur(self):
         return self._color
+
+
+def GetCouleur():
+    return 0
 
 
 class LetterCard(Card):
     def __init__(self, symbol="AAAA"):
         Card.__init__(self)
         self._symbol = symbol
-
-    def Getcouleur(self):
-        return 0
 
 
 class Memory:
@@ -84,15 +85,15 @@ class Memory:
 
         self._choice = int(self.typeCardChoice())  # Choice of the type of card
 
-        self._nCard = self.nChoice()  # Choice of the number of cards
+        self._nCard = self.numberOfCardChoice()  # Choice of the number of cards
 
-        self.Creationtab()  # Generation of the deck
+        self.CreationTab()  # Generation of the deck
 
         random.shuffle(self._tabCard)  # random shuffle of the deck
 
         self.Game()  # Start the game
 
-    def Creationtab(self):
+    def CreationTab(self):
 
         # Creation of the deck
         if self._choice == 1:
@@ -102,8 +103,6 @@ class Memory:
         if self._choice == 2:
             for i in range(0, self._nCard):
                 self._tabCard.append(LetterCard(self._tabLetter[i]));
-
-
 
         # Display the grid
         for i in range(0, self._nCard):
@@ -149,7 +148,7 @@ class Memory:
                 print("\nDidn't match a case")
 
     # Choose of the number of cards
-    def nChoice(self):
+    def numberOfCardChoice(self):
 
         while True:
             try:
@@ -175,7 +174,7 @@ class Memory:
                 select = int(input())
 
                 # Verification of the value
-                if select >= -1 and select < self._nCard and self._tabCard[select].Getfind() == 0:
+                if select >= -1 and select < self._nCard and self._tabCard[select].GetFind() == 0:
                     return select
                 else:
                     print("incorrect value")
@@ -194,11 +193,11 @@ class Memory:
 
             # print symbol if selected
             if (i == self._select or i == self._select2):
-                print(str(i) + "[" + self._tabCard[i].Getsymbol() + "] ", end=' ')
+                print(str(i) + "[" + self._tabCard[i].GetSymbol() + "] ", end=' ')
 
             # print symbol if pair already found
-            elif (self._tabCard[i].Getfind() == 1):
-                print(str(i) + "[" + self._tabCard[i].Getsymbol() + "] ", end=' ')
+            elif (self._tabCard[i].GetFind() == 1):
+                print(str(i) + "[" + self._tabCard[i].GetSymbol() + "] ", end=' ')
 
             # Else hide symbol
             else:
@@ -246,10 +245,10 @@ class Memory:
             self._try += 1;  # count number of try
 
             # Check if pair
-            if (self._tabCard[self._select].GetsymbolN(1) == self._tabCard[self._select2].GetsymbolN(1) and
-                    self._tabCard[self._select].Getcouleur() == self._tabCard[self._select2].Getcouleur()):
-                self._tabCard[self._select].Setfind(1)
-                self._tabCard[self._select2].Setfind(1)
+            if (self._tabCard[self._select].GetSymbolN(1) == self._tabCard[self._select2].GetSymbolN(1) and
+                    self._tabCard[self._select].GetCouleur() == self._tabCard[self._select2].GetCouleur()):
+                self._tabCard[self._select].SetFind(1)
+                self._tabCard[self._select2].SetFind(1)
                 self._pairFound += 1
 
             # Check if all pair are found
