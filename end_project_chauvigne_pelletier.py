@@ -1,26 +1,131 @@
-#end_project
-#-----------------------------------------------------
+# end_project
+# -----------------------------------------------------
 #                        IMPORT 
-#-----------------------------------------------------
+# -----------------------------------------------------
 import time
+import random
 
-#-----------------------------------------------------
-#                      CLASS
-#-----------------------------------------------------
+import string
+
+
+# -----------------------------------------------------
+#                      CLASS MEMORY
+# -----------------------------------------------------
+class Card:
+    nCard = 0
+
+    def __init__(self):
+        self._find = 0
+        Card.nCard += 1
+
+    def Setfind(self, find):
+        self._find = find
+
+    def Getfind(self):
+        return self._find
+
+    def Getsymbol(self):
+        return self._symbol
+
+    def GetsymbolN(self, n):
+        return self._symbol[n]
+
+
+class DeckCard(Card):
+    def __init__(self, symbol="AAAA"):
+        Card.__init__(self)
+        self._symbol = symbol
+        if self._symbol[2] == "♥" or self._symbol[2] == "♦":
+            self._color = "red"
+        else:
+            self._color = "black"
+
+    def Getcouleur(self):
+        return self._color
+
+
+class LetterCard(Card):
+    def __init__(self, symbol="AAAA"):
+        Card.__init__(self)
+        self._symbol = symbol
+
+    def Getcouleur(self):
+        return 0
+
+
 class Memory:
+    def __init__(self):
+
+        # Table of cards
+        self._tabCardDeck = (" 1♥ ", " 1♠ ", " 1♦ ", " 1♣ ", " 7♥ ", " 7♦ ",
+                             " 7♠ ", " 7♣ ", " 8♥ ", " 8♦ ", " 8♠ ", " 8♣ ",
+                             " 9♥ ", " 9♦ ", " 9♠ ", " 9♣ ", "10♥ ", "10♦ ",
+                             "10♠ ", "10♣ ", " V♥ ", " V♦ ", " V♠ ", " V♣ ",
+                             " D♥ ", " D♦ ", " D♠ ", " D♣ ", " R♥ ", " R♦ ", " R♠ ", " R♣ ")
+
+        self._tabLetter = ("AAAA", "AAAA", "BBBB", "BBBB", "CCCC", "CCCC", "DDDD", "DDDD", "EEEE", \
+                           "EEEE", "FFFF", "FFFF", "GGGG", "GGGG", "HHHH", "HHHH", "IIII", "IIII", \
+                           "JJJJ", "JJJJ", "KKKK", "KKKK", "LLLL", "LLLL", 'MMMM', "MMMM", "NNNN", \
+                           "NNNN", "OOOO", "OOOO", "PPPP", "PPPP", "QQQQ", "QQQQ", "RRRR", "RRRR")
+
+        # initialization of the table of card
+        self._tabCard = []
+
+        # initialization of variables
+        self._choice = 0
+        self._nCard = 0
+        self._select = None
+        self._select2 = None
+        self._pairFound = 0
+        self._try = 0;
+
     def memoryMenu(self):
-        print("\n-----------------   Memory menu   -----------------")
+        print("\n--------------♥♠♦♣ Memory menu ♥♠♦♣---------------")
+
+        self._choice = int(self.typeCardChoice())  # Choice of the type of card
+
+        self._nCard = self.nChoice()  # Choice of the number of cards
+
+        self.Creationtab()  # Generation of the deck
+
+        random.shuffle(self._tabCard)  # random shuffle of the deck
+
+        self.Game()  # Start the game
+
+    def Creationtab(self):
+
+        # Creation of the deck
+        if self._choice == 1:
+            for i in range(0, self._nCard):
+                self._tabCard.append(DeckCard(self._tabCardDeck[i]));
+
+        if self._choice == 2:
+            for i in range(0, self._nCard):
+                self._tabCard.append(LetterCard(self._tabLetter[i]));
+
+
+
+        # Display the grid
+        for i in range(0, self._nCard):
+            if i < 10:
+                print("0", end='')
+            print(str(i) + "[****] ", end=' ')
+            if (i + 1) % 4 == 0 and i != 0:
+                print()
+
+    def typeCardChoice(self):
+
         valideChoice = False
-        #the user will be asked to choose what memory game he wants to play 
-        while(not valideChoice):
-            try :
+        # the user will be asked to choose what memory game he wants to play
+        while (not valideChoice):
+            try:
                 memoryMenuChoice = int(input("\nPlease choose a valid item : \
-                \n1- Classical deck of cards (A♠, R♥...)\
-                \n2- Letter deck of card\
-                \n3- Go back\
-                \n4- Quit\
-                \n\nPlease enter your choice number : "))
-                valideChoice = (1 <= mainMenuChoice <= 4)
+                        \n1- Classical deck of cards (A♠, R♥...)\
+                        \n2- Letter deck of card\
+                        \n3- Go back\
+                        \n4- Quit\
+                        \n\nPlease enter your choice number : "))
+                valideChoice = (1 <= memoryMenuChoice <= 4)
                 if not valideChoice:
                     print("\nThe item you choosen does not exist")
                     time.sleep(1)
@@ -30,28 +135,145 @@ class Memory:
         match memoryMenuChoice:
             case 1:
                 print("\n Classical deck of cards")
+                return 1
             case 2:
                 print("\nLetter deck of cardy")
+                return 2
             case 3:
                 mainMenu()
             case 4:
                 print("\nWe hope to see you soon again")
                 time.sleep(1.5)
-                quit()   
+                quit()
             case _:
-                print("\nDidn't match a case")    
+                print("\nDidn't match a case")
 
-#-----------------------------------------------------
+    # Choose of the number of cards
+    def nChoice(self):
+
+        while True:
+            try:
+                print("With how many cards do you want to play ? (min : 6, max: 32)")
+                self._nCard = int(input())
+
+                # Verification of the value
+                if self._nCard < 6 or self._nCard > 32 or self._nCard % 2 != 0:
+                    print("Please enter an even value between 6 and 32")
+                else:
+                    return int(self._nCard)
+
+            # if not a number
+            except ValueError:
+                print("Please enter an even value between 6 and 32")
+
+    # Select a card
+    def InputCard(self):
+
+        while True:
+            try:
+                print("Enter card number (-1 to exit)", end=" : ")
+                select = int(input())
+
+                # Verification of the value
+                if select >= -1 and select < self._nCard and self._tabCard[select].Getfind() == 0:
+                    return select
+                else:
+                    print("incorrect value")
+
+            # if not a number
+            except ValueError:
+                print("the number must be between 1 and " + str(self._nCard))
+
+    # Display function
+    def Display(self):
+        for i in range(0, self._nCard):
+
+            # Add 0 before small number
+            if (i < 10):
+                print("0", end='')
+
+            # print symbol if selected
+            if (i == self._select or i == self._select2):
+                print(str(i) + "[" + self._tabCard[i].Getsymbol() + "] ", end=' ')
+
+            # print symbol if pair already found
+            elif (self._tabCard[i].Getfind() == 1):
+                print(str(i) + "[" + self._tabCard[i].Getsymbol() + "] ", end=' ')
+
+            # Else hide symbol
+            else:
+                print(str(i) + "[****] ", end=' ')
+
+            # line break every 4 displays
+            if ((i + 1) % 4 == 0 and i != 0):
+                print()
+
+    def Game(self):
+        # Loop if there are still pairs not found
+        while (self._pairFound != (self._nCard / 2)):
+            print("\n")
+            self._select = None
+            self._select2 = None
+
+            self._ended = False
+
+            print("CARD N°1 :")
+            self._select = self.InputCard()  # input first card
+
+            if (self._select == -1):  # exit if -1
+                break;
+
+            self.Display()  # Display table
+
+            print("\n")
+
+            print("CARD N°2 :")
+
+            while (True):
+                self._select2 = self.InputCard()  # input second card
+
+                # verify input
+                if self._select2 != self._select:
+                    break;
+                else:
+                    print("please select two different cards")
+
+            if (self._select2 == -1):  # exit if -1
+                break;
+
+            self.Display()  # Display table
+
+            self._try += 1;  # count number of try
+
+            # Check if pair
+            if (self._tabCard[self._select].GetsymbolN(1) == self._tabCard[self._select2].GetsymbolN(1) and
+                    self._tabCard[self._select].Getcouleur() == self._tabCard[self._select2].Getcouleur()):
+                self._tabCard[self._select].Setfind(1)
+                self._tabCard[self._select2].Setfind(1)
+                self._pairFound += 1
+
+            # Check if all pair are found
+            if (self._pairFound == (self._nCard / 2)):
+                print()
+                print()
+                print("============================")
+                print("Congratulation !")
+                print("You won with " + str(self._try) + " try")
+                print("============================")
+
+
+# -----------------------------------------------------
 #                      FUNCTIONS
-#-----------------------------------------------------
+# -----------------------------------------------------
 
-#-----------------mainMenu function-------------------
-def mainMenu() :
+
+# -----------------mainMenu function-------------------
+def mainMenu():
     print("\n-------------------   Main menu   -------------------")
     valideChoice = False
-    #the user will be asked to choose what he wants to do 
-    while(not valideChoice):
-        try :
+    # the user will be asked to choose what he wants to do
+    while (not valideChoice):
+        try:
             mainMenuChoice = int(input("\nPlease choose a valid item : \
             \n1- Memory Game\
             \n2- Statistic\
@@ -59,16 +281,16 @@ def mainMenu() :
             \n\nPlease enter your choice number : "))
             valideChoice = (1 <= mainMenuChoice <= 3)
             if not valideChoice:
-                    print("\nThe item you choosen does not exist")
-                    time.sleep(1)
+                print("\nThe item you choosen does not exist")
+                time.sleep(1)
         except(ValueError):
             print("\n***********An error occurs, please make another choice**********")
             time.sleep(1)
-    #according to the user answer the programm continue running
+    # according to the user answer the programm continue running
     match mainMenuChoice:
         case 1:
-            newMemory = Memory() #create an instance of the memory class
-            newMemory.memoryMenu() #start the memory menu
+            newMemory = Memory()  # create an instance of the memory class
+            newMemory.memoryMenu()  # start the memory menu
         case 2:
             print("\nStatistic Lobby")
         case 3:
@@ -76,20 +298,19 @@ def mainMenu() :
             time.sleep(1.5)
             quit()
         case _:
-            print("\nDidn't match a case")    
+            print("\nDidn't match a case")
+
+        # -----------------------------------------------------
 
 
+#                          MAIN
+# -----------------------------------------------------
 
-
-#-----------------------------------------------------
-#                          MAIN 
-#-----------------------------------------------------
-
-try :
+try:
     print("-----------------------------------------------------\n\
                     WELCOMME GAMER\n\
 -----------------------------------------------------")
     mainMenu()
 except(KeyboardInterrupt):
     print("\nWe hope to see you soon again")
-    time.sleep(1.5) #the programm freeze during 1.5s
+    time.sleep(1.5)  # the programm freeze during 1.5s
