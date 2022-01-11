@@ -58,6 +58,7 @@ class Memory:
     def __init__(self):
 
         # Table of cards
+        
         self._tabCardDeck = (" 1♥ ", " 1♠ ", " 1♦ ", " 1♣ ", " 7♥ ", " 7♦ ",
                              " 7♠ ", " 7♣ ", " 8♥ ", " 8♦ ", " 8♠ ", " 8♣ ",
                              " 9♥ ", " 9♦ ", " 9♠ ", " 9♣ ", "10♥ ", "10♦ ",
@@ -73,8 +74,10 @@ class Memory:
         self._tabCard = []
 
         # initialization of variables
+        self._ended = None
         self._choice = 0
         self._nCard = 0
+        self._difficulty = 0
         self._select = None
         self._select2 = None
         self._pairFound = 0
@@ -84,6 +87,8 @@ class Memory:
         print("\n--------------♥♠♦♣ Memory menu ♥♠♦♣---------------")
 
         self._choice = int(self.typeCardChoice())  # Choice of the type of card
+
+        self._difficulty = self.difficultyChoice()
 
         self._nCard = self.numberOfCardChoice()  # Choice of the number of cards
 
@@ -111,6 +116,27 @@ class Memory:
             print(str(i) + "[****] ", end=' ')
             if (i + 1) % 4 == 0 and i != 0:
                 print()
+
+    def difficultyChoice(self):
+        while True:
+            try:
+                print("with what difficulty do you want to play ? (1: Normal, 2: Hard):")
+                self._difficulty = int(input())
+
+                # Verification of the value
+                if self._difficulty != 1 and self._difficulty != 2:
+                    print("Please enter 1 or 2")
+                else:
+                    if self._difficulty == 1:
+                        print("Difficulty normal : you need to find pairs")
+                        return int(self._difficulty)
+                    if self._difficulty == 2:
+                        print("Difficulty hard : you need to find quadruple")
+                        return int(self._difficulty)
+
+            # if not a number
+            except ValueError:
+                print("Please enter 1 or 2")
 
     def typeCardChoice(self):
 
@@ -152,18 +178,18 @@ class Memory:
 
         while True:
             try:
-                print("With how many cards do you want to play ? (min : 6, max: 32)")
+                print("With how many cards do you want to play ? (min : 8, max: 32)")
                 self._nCard = int(input())
 
                 # Verification of the value
-                if self._nCard < 6 or self._nCard > 32 or self._nCard % 2 != 0:
-                    print("Please enter an even value between 6 and 32")
+                if self._nCard < 8 or self._nCard > 32 or self._nCard % (self._difficulty*2) != 0:
+                    print("Please enter an even value between 8 and 32")
                 else:
                     return int(self._nCard)
 
             # if not a number
             except ValueError:
-                print("Please enter an even value between 6 and 32")
+                print("Please enter an even value between 8 and 32")
 
     # Select a card
     def InputCard(self):
