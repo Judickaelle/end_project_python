@@ -73,6 +73,10 @@ class Memory:
                            "JJJJ", "JJJJ", "KKKK", "KKKK", "LLLL", "LLLL", 'MMMM', "MMMM", "NNNN", \
                            "NNNN", "OOOO", "OOOO", "PPPP", "PPPP", "QQQQ", "QQQQ", "RRRR", "RRRR")
 
+        self._tabLetterHard = ("AAAA", "AAAA", "AAAA", "AAAA", "BBBB", "BBBB", "BBBB", "BBBB", "CCCC", "CCCC", "CCCC", "CCCC", \
+                               "DDDD", "DDDD", "DDDD", "DDDD", "EEEE", "EEEE", "EEEE", "EEEE", "FFFF", "FFFF", "FFFF", "FFFF", \
+                               "GGGG", "GGGG", "GGGG", "GGGG", "HHHH", "HHHH", "HHHH", "HHHH", "IIII", "IIII", "IIII", "IIII")
+
         # initialization of the table of card
         self._tabCard = []
 
@@ -83,6 +87,8 @@ class Memory:
         self._difficulty = 0
         self._select = None
         self._select2 = None
+        self._select3 = None
+        self._select4 = None
         self._pairFound = 0
         self._try = 0;
 
@@ -109,8 +115,12 @@ class Memory:
                 self._tabCard.append(DeckCard(self._tabCardDeck[i]));
 
         if self._choice == 2:
-            for i in range(0, self._nCard):
-                self._tabCard.append(LetterCard(self._tabLetter[i]));
+            if self._difficulty == 1:
+                for i in range(0, self._nCard):
+                    self._tabCard.append(LetterCard(self._tabLetter[i]));
+            else:
+                for i in range(0, self._nCard):
+                    self._tabCard.append(LetterCard(self._tabLetterHard[i]));
 
         # Display the grid
         for i in range(0, self._nCard):
@@ -209,7 +219,7 @@ class Memory:
 
             # if not a number
             except ValueError:
-                print("the number must be between 1 and " + str(self._nCard))
+                print("the number must be between 0 and " + str(self._nCard))
 
     # Display cards function
     def Display(self):
@@ -220,7 +230,7 @@ class Memory:
                 print("0", end='')
 
             # print symbol if selected
-            if (i == self._select or i == self._select2):
+            if (i == self._select or i == self._select2 or i == self._select3 or i == self._select4):
                 print(str(i) + "[" + self._tabCard[i].GetSymbol() + "] ", end=' ')
 
             # print symbol if pair already found
@@ -241,6 +251,8 @@ class Memory:
             print("\n")
             self._select = None
             self._select2 = None
+            self._select3 = None
+            self._select4 = None
 
             self._ended = False
 
@@ -253,7 +265,6 @@ class Memory:
             self.Display()  # Display table
 
             print("\n")
-
             print("CARD N°2 :")
 
             while (True):
@@ -268,17 +279,63 @@ class Memory:
             if (self._select2 == -1):  # exit if -1
                 break;
 
-            self.Display()  # Display table
+            self.Display()
+
+            if self._difficulty == 2:
+                print("\n")
+                print("CARD N°3 :")
+
+                while (True):
+                    self._select3 = self.InputCard()  # input second card
+
+                    # verify input
+                    if self._select3 != self._select and self._select3 != self._select2:
+                        break;
+                    else:
+                        print("please select two different cards")
+
+                if (self._select3 == -1):  # exit if -1
+                    break;
+
+                self.Display()  # Display table
+
+                print("\n")
+                print("CARD N°4 :")
+
+                while (True):
+                    self._select4 = self.InputCard()  # input second card
+
+                    # verify input
+                    if self._select4 != self._select and self._select4 != self._select2 and self._select4 != self._select3 :
+                        break;
+                    else:
+                        print("please select two different cards")
+
+                if (self._select4 == -1):  # exit if -1
+                    break;
+
+                self.Display()  # Display table
 
             self._try += 1;  # count number of try
 
             # Check if pair
-            if (self._tabCard[self._select].GetSymbolN(1) == self._tabCard[self._select2].GetSymbolN(1) and
-                    self._tabCard[self._select].GetCouleur() == self._tabCard[self._select2].GetCouleur()):
-                self._tabCard[self._select].SetFind(1)
-                self._tabCard[self._select2].SetFind(1)
-                self._pairFound += 1
+            if self._difficulty == 1:
+                if (self._tabCard[self._select].GetSymbolN(1) == self._tabCard[self._select2].GetSymbolN(1) and
+                        self._tabCard[self._select].GetCouleur() == self._tabCard[self._select2].GetCouleur()):
+                    self._tabCard[self._select].SetFind(1)
+                    self._tabCard[self._select2].SetFind(1)
+                    self._pairFound += 1
 
+            # Check if quadriple
+            if self._difficulty == 2:
+                if (self._tabCard[self._select].GetSymbolN(1) == self._tabCard[self._select2].GetSymbolN(1) and
+                        self._tabCard[self._select2].GetSymbolN(1) == self._tabCard[self._select3].GetSymbolN(1) and
+                        self._tabCard[self._select3].GetSymbolN(1) == self._tabCard[self._select4].GetSymbolN(1)):
+                    self._tabCard[self._select].SetFind(1)
+                    self._tabCard[self._select2].SetFind(1)
+                    self._tabCard[self._select3].SetFind(1)
+                    self._tabCard[self._select4].SetFind(1)
+                    self._pairFound += 2
             # Check if all pair are found
             if (self._pairFound == (self._nCard / 2)):
                 print("\n\n==============================================")
@@ -343,7 +400,7 @@ def saveGame(playerName, game, difficulty, score):
     my_file.write(playerName,"\t",game,"\t",difficulty,"\t",score,"\t",today,"\n") 
     my_file.close
 
-    
+
 # ---------------- Read statistic file function ------------------
 def readStatisticFile():
     dfr = DataFileReader("waterlevel.txt", sep="\t", header=True)
