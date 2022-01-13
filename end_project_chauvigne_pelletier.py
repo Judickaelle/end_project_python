@@ -47,14 +47,16 @@ class DeckCard(Card):
         return self._color
 
 
-def GetCouleur():
-    return 0
+
 
 # --------------- Deck of LetterCards ---------------
 class LetterCard(Card):
     def __init__(self, symbol="AAAA"):
         Card.__init__(self)
         self._symbol = symbol
+
+    def GetCouleur(self):
+        return 0
 
 # ------------------ Memory ------------------
 class Memory:
@@ -85,6 +87,7 @@ class Memory:
         self._choice = 0
         self._nCard = 0
         self._difficulty = 0
+        self._difficultyName = ""
         self._select = None
         self._select2 = None
         self._select3 = None
@@ -96,15 +99,10 @@ class Memory:
         print("\n--------------♥♠♦♣ Memory menu ♥♠♦♣---------------")
 
         self._choice = int(self.typeCardChoice())  # Choice of the type of card
-
         self._difficulty = self.difficultyChoice()
-
         self._nCard = self.numberOfCardChoice()  # Choice of the number of cards
-
         self.CreationTab()  # Generation of the deck
-
         random.shuffle(self._tabCard)  # random shuffle of the deck
-
         self.Game()  # Start the game
 
     def CreationTab(self):
@@ -142,9 +140,11 @@ class Memory:
                 else:
                     if self._difficulty == 1:
                         print("\nDifficulty normal : you need to find pairs")
+                        self._difficultyName = "Normal"
                         return int(self._difficulty)
                     if self._difficulty == 2:
                         print("\nDifficulty hard : you need to find quadruple")
+                        self._difficultyName = "Hard"
                         return int(self._difficulty)
 
             # if not a number
@@ -343,8 +343,10 @@ class Memory:
                 print("            You won with " + str(self._try) + " try")
                 print("==============================================")
 
-                playerName = input("Please enter your name to save your result : ")
-                saveGame(playerName, "Memory", "difficulty", int(self._try))
+
+                playerName = input("\nPlease enter your name to save your result : ")
+                saveGame(playerName, "Memory", self._difficultyName, self._try)
+                mainMenu()
 
 
 # -----------------------------------------------------
@@ -378,6 +380,7 @@ def mainMenu():
             newMemory.memoryMenu()  # start the memory menu
         case 2:
             print("\nStatistic Lobby")
+            readStatisticFile()
         case 3:
             print("\nWe hope to see you soon again")
             time.sleep(1.5)
@@ -385,31 +388,45 @@ def mainMenu():
         case _:
             print("\nDidn't match a case")
 
+
 # -------------------- Save game function ----------------------
 def saveGame(playerName, game, difficulty, score):
-    myfilepath = Path('stat.txt')
-    try:
-        myfilepath.touch(exist_ok=True)  #If we set the exist_ok as True, the function will do nothing if the file exists.
-    except(FileExistsError):
-        my_file = open("stat.txt", "a+")    #Create the file if it does not exist and then open it in append mode
+    my_filepath = Path("stat.txt")
+    if not my_filepath.is_file():
+        my_file = open("stat.txt", "a+")
         my_file.write("Player Name  Game    Difficulty  Number of try   Date\n")
+        print("\nThe file stat.txt has been created")
         my_file.close
+
+    ###############################
+    #les enregistrement sont une liste de dictionnaire avec pour clé le nom du joueur et comme valeur un
+    ###############################
+
 
     my_file = open("stat.txt", "a")
     today = date.today()
-    my_file.write(playerName,"\t",game,"\t",difficulty,"\t",score,"\t",today,"\n") 
+    addtofile = playerName+"\t"+game+"\t"+difficulty+"\t"+str(score)+"\t"+str(today)+"\n"
+    my_file.write(addtofile) 
     my_file.close
+
+    print("\nThe game has been successfully saved !")
 
 
 # ---------------- Read statistic file function ------------------
 def readStatisticFile():
-    dfr = DataFileReader("waterlevel.txt", sep="\t", header=True)
-    header = dfr.get_header()
-    print(header)
-
+    dfr = DataFileReader("stat.txt", sep="\t", header=True)
+    
+    ####################################################
+    #regarder si le fichier existe si non dire au joueur de jouer au moins une partie avant
+    ####################################################
+    
     i=0
     while True:
+
         content = dfr.get_data()
+        if (content == None):
+            break     # reached EndOfFile
+
         print(i,":   ",content)
         i=i+1
 
