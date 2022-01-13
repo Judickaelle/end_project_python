@@ -4,6 +4,7 @@
 # -----------------------------------------------------
 from pathlib import Path
 from dfr import DataFileReader   # get access to data file reader
+from datetime import date
 import time
 import random
 
@@ -329,14 +330,31 @@ def mainMenu():
 
 # -------------------- Save game function ----------------------
 def saveGame(playerName, game, difficulty, score):
-    #my_file = open("stat.txt", "a+")    #Create the file if it does not exist and then open it in append mode
+    myfilepath = Path('stat.txt')
+    try:
+        myfilepath.touch(exist_ok=True)  #If we set the exist_ok as True, the function will do nothing if the file exists.
+    except(FileExistsError):
+        my_file = open("stat.txt", "a+")    #Create the file if it does not exist and then open it in append mode
+        my_file.write("Player Name  Game    Difficulty  Number of try   Date\n")
+        my_file.close
+
+    my_file = open("stat.txt", "a")
+    today = date.today()
+    my_file.write(playerName,"\t",game,"\t",difficulty,"\t",score,"\t",today,"\n") 
+    my_file.close
 
     
-    my_file.close()
+# ---------------- Read statistic file function ------------------
+def readStatisticFile():
+    dfr = DataFileReader("waterlevel.txt", sep="\t", header=True)
+    header = dfr.get_header()
+    print(header)
 
-    dfr = DataFileReader("waterlevel.txt")
-    content = dfr.get_value()
-    print(content)
+    i=0
+    while True:
+        content = dfr.get_data()
+        print(i,":   ",content)
+        i=i+1
 
 # -----------------------------------------------------
 #                          MAIN
