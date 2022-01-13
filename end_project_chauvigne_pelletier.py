@@ -2,15 +2,17 @@
 # -----------------------------------------------------
 #                        IMPORT 
 # -----------------------------------------------------
+from pathlib import Path
+from dfr import DataFileReader   # get access to data file reader
 import time
 import random
-
 
 # -----------------------------------------------------
 #                      CLASS
 # -----------------------------------------------------
 
-# ----------   CLASS FOR MEMORY   ----------
+# ----------------   CLASS FOR MEMORY  ----------------
+# ----------------------- Cards -----------------------
 class Card:
     nCard = 0
 
@@ -30,7 +32,7 @@ class Card:
     def GetSymbolN(self, n):
         return self._symbol[n]
 
-
+# ------------------ Deck of Cards ------------------
 class DeckCard(Card):
     def __init__(self, symbol="AAAA"):
         Card.__init__(self)
@@ -47,13 +49,13 @@ class DeckCard(Card):
 def GetCouleur():
     return 0
 
-
+# --------------- Deck of LetterCards ---------------
 class LetterCard(Card):
     def __init__(self, symbol="AAAA"):
         Card.__init__(self)
         self._symbol = symbol
 
-
+# ------------------ Memory ------------------
 class Memory:
     def __init__(self):
 
@@ -120,23 +122,23 @@ class Memory:
     def difficultyChoice(self):
         while True:
             try:
-                print("with what difficulty do you want to play ? (1: Normal, 2: Hard):")
+                print("\nwith what difficulty do you want to play ? (1: Normal, 2: Hard):")
                 self._difficulty = int(input())
 
                 # Verification of the value
                 if self._difficulty != 1 and self._difficulty != 2:
-                    print("Please enter 1 or 2")
+                    print("\nPlease enter 1 or 2")
                 else:
                     if self._difficulty == 1:
-                        print("Difficulty normal : you need to find pairs")
+                        print("\nDifficulty normal : you need to find pairs")
                         return int(self._difficulty)
                     if self._difficulty == 2:
-                        print("Difficulty hard : you need to find quadruple")
+                        print("\nDifficulty hard : you need to find quadruple")
                         return int(self._difficulty)
 
             # if not a number
             except ValueError:
-                print("Please enter 1 or 2")
+                print("\nPlease enter 1 or 2")
 
     def typeCardChoice(self):
 
@@ -178,22 +180,21 @@ class Memory:
 
         while True:
             try:
-                print("With how many cards do you want to play ? (min : 8, max: 32)")
+                print("\nWith how many cards do you want to play ? (min : 8, max: 32, even number)")
                 self._nCard = int(input())
 
                 # Verification of the value
                 if self._nCard < 8 or self._nCard > 32 or self._nCard % (self._difficulty*2) != 0:
-                    print("Please enter an even value between 8 and 32")
+                    print("\nPlease enter an even value between 8 and 32")
                 else:
                     return int(self._nCard)
 
             # if not a number
             except ValueError:
-                print("Please enter an even value between 8 and 32")
+                print("\nPlease enter an even value between 8 and 32")
 
     # Select a card
     def InputCard(self):
-
         while True:
             try:
                 print("Enter card number (-1 to exit)", end=" : ")
@@ -209,7 +210,7 @@ class Memory:
             except ValueError:
                 print("the number must be between 1 and " + str(self._nCard))
 
-    # Display function
+    # Display cards function
     def Display(self):
         for i in range(0, self._nCard):
 
@@ -279,12 +280,13 @@ class Memory:
 
             # Check if all pair are found
             if (self._pairFound == (self._nCard / 2)):
-                print()
-                print()
-                print("============================")
-                print("Congratulation !")
-                print("You won with " + str(self._try) + " try")
-                print("============================")
+                print("\n\n==============================================")
+                print("            Congratulation !")
+                print("            You won with " + str(self._try) + " try")
+                print("==============================================")
+
+                playerName = input("Please enter your name to save your result : ")
+                saveGame(playerName, "Memory", "difficulty", int(self._try))
 
 
 # -----------------------------------------------------
@@ -292,7 +294,7 @@ class Memory:
 # -----------------------------------------------------
 
 
-# -----------------mainMenu function-------------------
+# ----------------- mainMenu function-------------------
 def mainMenu():
     print("\n-------------------   Main menu   -------------------")
     valideChoice = False
@@ -325,9 +327,18 @@ def mainMenu():
         case _:
             print("\nDidn't match a case")
 
-        # -----------------------------------------------------
+# -------------------- Save game function ----------------------
+def saveGame(playerName, game, difficulty, score):
+    #my_file = open("stat.txt", "a+")    #Create the file if it does not exist and then open it in append mode
 
+    
+    my_file.close()
 
+    dfr = DataFileReader("waterlevel.txt")
+    content = dfr.get_value()
+    print(content)
+
+# -----------------------------------------------------
 #                          MAIN
 # -----------------------------------------------------
 
