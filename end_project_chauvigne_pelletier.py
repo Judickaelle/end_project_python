@@ -337,6 +337,7 @@ class Memory:
                     self._tabCard[self._select4].SetFind(1)
                     self._pairFound += 2
             # Check if all pair are found
+
             if (self._pairFound == (self._nCard / 2)):
                 print("\n\n==============================================")
                 print("            Congratulation !")
@@ -347,6 +348,7 @@ class Memory:
                 playerName = input("\nPlease enter your name to save your result : ")
                 saveGame(playerName, "Memory", self._difficultyName, self._try)
                 mainMenu()
+
 
 
 # -----------------------------------------------------
