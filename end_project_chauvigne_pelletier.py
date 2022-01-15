@@ -347,6 +347,7 @@ class Memory:
 
                 playerName = input("\nPlease enter your name to save your result : ")
                 saveGame(playerName, "Memory", self._difficultyName, self._try)
+                updateStat(playerName, self._difficulty, self._try)
                 mainMenu()
 
 
@@ -414,6 +415,35 @@ def saveGame(playerName, game, difficulty, score):
     print("\nThe game has been successfully saved !")
 
 
+
+#	The name of the player
+#	The number of games played
+#	The average of try per difficulty
+#	The best score per difficulty
+
+def updateStat(playerName, difficulty, ntry):
+    value = []
+    if playerName in globalStat:
+        d = globalStat[playerName]
+        i = 0
+        if d is not None:
+            for v in d:
+                value.append(int(v))
+                i += 1
+
+            # Average of try
+            value[1] = (value[1]*value[0] + ntry)/(value[0]+1)
+
+            # Best score
+            if ntry < value[2]:
+                value[2] = ntry
+
+            # Number of games played
+            value[0] += 1
+    else:
+        globalStat[playerName] = (1, ntry, ntry)
+    print(value)
+
 # ---------------- Read statistic file function ------------------
 def readStatisticFile():
     dfr = DataFileReader("stat.txt", sep="\t", header=True)
@@ -440,6 +470,8 @@ try:
     print("-----------------------------------------------------\n\
                     WELCOMME GAMER\n\
 -----------------------------------------------------")
+    globalStat = {'H': (1, 12, 9)}
+    updateStat("Lucas", 1, 8)
     mainMenu()
 except(KeyboardInterrupt):
     print("\nWe hope to see you soon again")
