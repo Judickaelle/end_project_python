@@ -7,6 +7,7 @@ from dfr import DataFileReader   # get access to data file reader
 from datetime import date
 import time
 import random
+import json
 
 # -----------------------------------------------------
 #                      CLASS
@@ -394,23 +395,43 @@ def mainMenu():
 
 # -------------------- Save game function ----------------------
 def saveGame(playerName, game, difficulty, score):
-    my_filepath = Path("stat.txt")
-    if not my_filepath.is_file():
-        my_file = open("stat.txt", "a+")
-        my_file.write("Player Name  Game    Difficulty  Number of try   Date\n")
-        print("\nThe file stat.txt has been created")
-        my_file.close
+#    my_filepath = Path("stat.txt")
+#    if not my_filepath.is_file():   #create a file with the following geader if it does not exist
+#        my_file = open("stat.txt", "a+")
+#        my_file.write("Player Name  Game    Difficulty  Number of try   Date\n")
+#        print("\nThe file stat.txt has been created")
+#        my_file.close
 
-    ###############################
-    #les enregistrement sont une liste de dictionnaire avec pour clé le nom du joueur et comme valeur un
-    ###############################
+#    my_file = open("stat.txt", "a") #opening of the file
+
+    try:        
+        a_file = open("stat.json", "r")             #opening the file
+        gameRecord = json.loads(a_file.read())      #getting the data from the file and storing them into a dictionary
+        a_file.close()                              #closing the file
+    except(FileNotFoundError):                      #if the file does not exist
+        gameRecord = {}                             #create the dictionary from scratch
+
+    today = date.today()                            #get the date of today
+    new_record = (game, difficulty, score, today)   #the new tuple to register
+
+    playerData = gameRecord.get(playerName)         #get the data from the player name
+    if playerData == None:                          #no data available
+        #create a new key inside the dictionary
+        data_list = []
+        data_list.append(new_record)                #add the new tuple inside a list
+        gameRecord[playerName] = data_list          #store the value
+    else:
+        #update existing key
+        gameRecord[playerName].append(new_record)
+
+    my_file = open("stat.json", "w")                #open the file to overright it
+    json.dump(gameRecord, my_file)                  #parse the data to json
+    my_file.close()                                 #close the file
 
 
-    my_file = open("stat.txt", "a")
-    today = date.today()
-    addtofile = playerName+"\t"+game+"\t"+difficulty+"\t"+str(score)+"\t"+str(today)+"\n"
-    my_file.write(addtofile) 
-    my_file.close
+#    addtofile = playerName+"\t"+game+"\t"+difficulty+"\t"+str(score)+"\t"+str(today)+"\n"
+#    my_file.write(addtofile) 
+#    my_file.close
 
     print("\nThe game has been successfully saved !")
 
@@ -421,28 +442,28 @@ def saveGame(playerName, game, difficulty, score):
 #	The average of try per difficulty
 #	The best score per difficulty
 
-def updateStat(playerName, difficulty, ntry):
-    value = []
-    if playerName in globalStat:
-        d = globalStat[playerName]
-        i = 0
-        if d is not None:
-            for v in d:
-                value.append(int(v))
-                i += 1
-
-            # Average of try
-            value[1] = (value[1]*value[0] + ntry)/(value[0]+1)
-
-            # Best score
-            if ntry < value[2]:
-                value[2] = ntry
-
-            # Number of games played
-            value[0] += 1
-    else:
-        globalStat[playerName] = (1, ntry, ntry)
-    print(value)
+#def updateStat(playerName, difficulty, ntry):
+#    value = []
+#    if playerName in globalStat:
+#        d = globalStat[playerName]
+#        i = 0
+#        if d is not None:
+#            for v in d:
+#                value.append(int(v))
+#                i += 1
+#
+#            # Average of try
+#            value[1] = (value[1]*value[0] + ntry)/(value[0]+1)
+#
+#            # Best score
+#            if ntry < value[2]:
+#                value[2] = ntry
+#
+#            # Number of games played
+#            value[0] += 1
+#    else:
+#        globalStat[playerName] = (1, ntry, ntry)
+#    print(value)
 
 # ---------------- Read statistic file function ------------------
 def readStatisticFile():
