@@ -347,8 +347,10 @@ class Memory:
 
 
                 playerName = input("\nPlease enter your name to save your result : ")
-                saveGame(playerName, "Memory", self._difficultyName, self._try)
-                #updateStat(playerName, self._difficulty, self._try)
+                saveMemoryGame(playerName, self._difficultyName, self._try) 
+                ###############################################
+                # Ajouter le numbre de paire dans les données
+                ############################################
                 mainMenu()
 
 
@@ -384,7 +386,6 @@ def mainMenu():
             newMemory.memoryMenu()  # start the memory menu
         case 2:
             statisticMenu()
-            readStatisticFile()
         case 3:
             print("\nWe hope to see you soon again")
             time.sleep(1.5)
@@ -415,8 +416,11 @@ def statisticMenu():
             time.sleep(1)
     match statisticMenuChoice:
         case 1:
-            print("\n Memory 10 best score")
+            print("\n Memory best score")
             # to implement ############################################################
+            readStatisticFile()
+            input("Press Enter to continue")
+            statisticMenu()
         case 2:
             print("\nPlayer best score")
             # to implement ############################################################
@@ -431,7 +435,7 @@ def statisticMenu():
 
 
 # -------------------- Save game function ----------------------
-def saveGame(playerName, game, difficulty, score):
+def saveMemoryGame(playerName, difficulty, pairsNumber, score):
 #    my_filepath = Path("stat.txt")
 #    if not my_filepath.is_file():   #create a file with the following geader if it does not exist
 #        my_file = open("stat.txt", "a+")
@@ -440,6 +444,8 @@ def saveGame(playerName, game, difficulty, score):
 #        my_file.close
 
 #    my_file = open("stat.txt", "a") #opening of the file
+
+    game = "Memory"
 
     try:        
         playersStat_file = open("playersStat.json", "r")            #opening the file
@@ -453,8 +459,8 @@ def saveGame(playerName, game, difficulty, score):
         playersRecord = {}
 
     today = date.today()                                            #get the date of today
-    new_player_record = (game, difficulty, score, str(today))       #the new tuple to register
-    new_game_record = (playerName, difficulty, score, str(today))
+    new_player_record = (game, difficulty, pairsNumber, score, str(today))       #the new tuple to register
+    new_game_record = (playerName, difficulty, pairsNumber, score, str(today))
 
 
     #store the data with the player name as key
@@ -468,7 +474,7 @@ def saveGame(playerName, game, difficulty, score):
         #update existing key
         playersRecord[playerName].append(new_player_record)
 
-    playersStat_file = open("playersStat.json", "w")                #open the file to overright it
+    playersStat_file = open("playersStat.json", "w")                #open the file to overwrite it
     json.dump(playersRecord, playersStat_file)                      #parse the data to json
     playersStat_file.close()                                        #close the file
 
@@ -483,7 +489,7 @@ def saveGame(playerName, game, difficulty, score):
         #update existing key
         gameRecord[game].append(new_game_record)
 
-    gameStat_file = open("gameStat.json", "w")                      #open the file to overright it
+    gameStat_file = open("gameStat.json", "w")                      #open the file to overwrite it
     json.dump(gameRecord, gameStat_file)                            #parse the data to json
     gameStat_file.close()                                           #close the file
 
@@ -526,7 +532,7 @@ def saveGame(playerName, game, difficulty, score):
 def readStatisticFile():
 #    dfr = DataFileReader("stat.txt", sep="\t", header=True)
     try:        
-        a_file = open("stat.json", "r")             #opening the file
+        a_file = open("playersStat.json", "r")             #opening the file
         gameRecord = json.loads(a_file.read())      #getting the data from the file and storing them into a dictionary
         a_file.close()                              #closing the file
     except(FileNotFoundError):                      #if the file does not exist
