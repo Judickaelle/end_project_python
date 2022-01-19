@@ -7,6 +7,7 @@ from dfr import DataFileReader   # get access to data file reader
 from datetime import date
 import time
 import random
+import json
 
 # -----------------------------------------------------
 #                      CLASS
@@ -346,8 +347,10 @@ class Memory:
 
 
                 playerName = input("\nPlease enter your name to save your result : ")
-                saveGame(playerName, "Memory", self._difficultyName, self._try)
-                updateStat(playerName, self._difficulty, self._try)
+                saveMemoryGame(playerName, self._difficultyName, self._try) 
+                ###############################################
+                # Ajouter le numbre de paire dans les données
+                ############################################
                 mainMenu()
 
 
@@ -382,85 +385,173 @@ def mainMenu():
             newMemory = Memory()  # create an instance of the memory class
             newMemory.memoryMenu()  # start the memory menu
         case 2:
-            print("\nStatistic Lobby")
-            readStatisticFile()
+            statisticMenu()
         case 3:
             print("\nWe hope to see you soon again")
             time.sleep(1.5)
             quit()
         case _:
             print("\nDidn't match a case")
+            
+
+#-----------------   Statistic menu   -----------------
+def statisticMenu():
+    print("\n-----------------   Statistic menu   -----------------")     
+    valideChoice = False
+    # the user will be asked to choose what memory game he wants to play
+    while (not valideChoice):
+        try:
+            statisticMenuChoice = int(input("\nPlease choose a valid item : \
+                    \n1- Memory 10 best score\
+                    \n2- Player best score\
+                    \n3- Go back\
+                    \n4- Quit\
+                    \n\nPlease enter your choice number : "))
+            valideChoice = (1 <= statisticMenuChoice <= 4)
+            if not valideChoice:
+                print("\nThe item you choosen does not exist")
+                time.sleep(1)
+        except(ValueError):
+            print("\n***********An error occurs, please make another choice**********")
+            time.sleep(1)
+    match statisticMenuChoice:
+        case 1:
+            print("\n Memory best score")
+            # to implement ############################################################
+            readStatisticFile()
+            input("Press Enter to continue")
+            statisticMenu()
+        case 2:
+            print("\nPlayer best score")
+            # to implement ############################################################
+        case 3:
+            mainMenu()
+        case 4:
+            print("\nWe hope to see you soon again")
+            time.sleep(1.5)
+            quit()
+        case _:
+            print("\nDidn't match a case")       
 
 
 # -------------------- Save game function ----------------------
-def saveGame(playerName, game, difficulty, score):
-    my_filepath = Path("stat.txt")
-    if not my_filepath.is_file():
-        my_file = open("stat.txt", "a+")
-        my_file.write("Player Name  Game    Difficulty  Number of try   Date\n")
-        print("\nThe file stat.txt has been created")
-        my_file.close
+def saveMemoryGame(playerName, difficulty, pairsNumber, score):
+#    my_filepath = Path("stat.txt")
+#    if not my_filepath.is_file():   #create a file with the following geader if it does not exist
+#        my_file = open("stat.txt", "a+")
+#        my_file.write("Player Name  Game    Difficulty  Number of try   Date\n")
+#        print("\nThe file stat.txt has been created")
+#        my_file.close
 
-    ###############################
-    #les enregistrement sont une liste de dictionnaire avec pour clé le nom du joueur et comme valeur un
-    ###############################
+#    my_file = open("stat.txt", "a") #opening of the file
+
+    game = "Memory"
+
+    try:        
+        playersStat_file = open("playersStat.json", "r")            #opening the file
+        gameStat_file = open("gameStat.json", "r")
+        playersRecord = json.loads(playersStat_file.read())         #getting the data from the file and storing them into a dictionary
+        gameRecord = json.loads(gameStat_file.read())
+        playersStat_file.close()                                    #closing the file
+        gameStat_file.close()
+    except(FileNotFoundError):                                      #if the file does not exist
+        gameRecord = {}                                             #create the dictionary from scratch
+        playersRecord = {}
+
+    today = date.today()                                            #get the date of today
+    new_player_record = (game, difficulty, pairsNumber, score, str(today))       #the new tuple to register
+    new_game_record = (playerName, difficulty, pairsNumber, score, str(today))
 
 
-    my_file = open("stat.txt", "a")
-    today = date.today()
-    addtofile = playerName+"\t"+game+"\t"+difficulty+"\t"+str(score)+"\t"+str(today)+"\n"
-    my_file.write(addtofile) 
-    my_file.close
+    #store the data with the player name as key
+    playerData = playersRecord.get(playerName)                      #get the data from the player name
+    if playerData == None:                                          #no data available
+        #create a new key inside the dictionary
+        data_player_list = []
+        data_player_list.append(new_player_record)                  #add the new tuple inside a list
+        playersRecord[playerName] = data_player_list                #store the value
+    else:
+        #update existing key
+        playersRecord[playerName].append(new_player_record)
+
+    playersStat_file = open("playersStat.json", "w")                #open the file to overwrite it
+    json.dump(playersRecord, playersStat_file)                      #parse the data to json
+    playersStat_file.close()                                        #close the file
+
+    #store the data with the game as key
+    gameData = gameRecord.get(game)                                 #get the data from the game
+    if gameData == None:                                            #no data available
+        #create a new key inside the dictionary
+        data_game_list = []
+        data_game_list.append(new_game_record)                      #add the new tuple inside a list
+        gameRecord[game] = data_game_list                           #store the value
+    else:
+        #update existing key
+        gameRecord[game].append(new_game_record)
+
+    gameStat_file = open("gameStat.json", "w")                      #open the file to overwrite it
+    json.dump(gameRecord, gameStat_file)                            #parse the data to json
+    gameStat_file.close()                                           #close the file
+
+
+#    addtofile = playerName+"\t"+game+"\t"+difficulty+"\t"+str(score)+"\t"+str(today)+"\n"
+#    my_file.write(addtofile) 
+#    my_file.close
 
     print("\nThe game has been successfully saved !")
-
-
 
 #	The name of the player
 #	The number of games played
 #	The average of try per difficulty
 #	The best score per difficulty
 
-def updateStat(playerName, difficulty, ntry):
-    value = []
-    if playerName in globalStat:
-        d = globalStat[playerName]
-        i = 0
-        if d is not None:
-            for v in d:
-                value.append(int(v))
-                i += 1
-
-            # Average of try
-            value[1] = (value[1]*value[0] + ntry)/(value[0]+1)
-
-            # Best score
-            if ntry < value[2]:
-                value[2] = ntry
-
-            # Number of games played
-            value[0] += 1
-    else:
-        globalStat[playerName] = (1, ntry, ntry)
-    print(value)
+#def updateStat(playerName, difficulty, ntry):
+#    value = []
+#    if playerName in globalStat:
+#        d = globalStat[playerName]
+#        i = 0
+#        if d is not None:
+#            for v in d:
+#                value.append(int(v))
+#                i += 1
+#
+#            # Average of try
+#            value[1] = (value[1]*value[0] + ntry)/(value[0]+1)
+#
+#            # Best score
+#            if ntry < value[2]:
+#                value[2] = ntry
+#
+#            # Number of games played
+#            value[0] += 1
+#    else:
+#        globalStat[playerName] = (1, ntry, ntry)
+#    print(value)
 
 # ---------------- Read statistic file function ------------------
 def readStatisticFile():
-    dfr = DataFileReader("stat.txt", sep="\t", header=True)
-    
-    ####################################################
-    #regarder si le fichier existe si non dire au joueur de jouer au moins une partie avant
-    ####################################################
-    
-    i=0
-    while True:
+#    dfr = DataFileReader("stat.txt", sep="\t", header=True)
+    try:        
+        a_file = open("playersStat.json", "r")             #opening the file
+        gameRecord = json.loads(a_file.read())      #getting the data from the file and storing them into a dictionary
+        a_file.close()                              #closing the file
+    except(FileNotFoundError):                      #if the file does not exist
+        print("\nPlease play at least one time to have record")
+        time.sleep(1)
+        mainMenu()    
 
-        content = dfr.get_data()
-        if (content == None):
-            break     # reached EndOfFile
+    print("*****************************************")
+    print(gameRecord)                             
+    
+#    i=0
+#    while True:
 
-        print(i,":   ",content)
-        i=i+1
+#        content = dfr.get_data()
+#        if (content == None):
+#            break     # reached EndOfFile
+
+#        print(i,":   ",content)
+#        i=i+1
 
 # -----------------------------------------------------
 #                          MAIN
@@ -470,8 +561,8 @@ try:
     print("-----------------------------------------------------\n\
                     WELCOMME GAMER\n\
 -----------------------------------------------------")
-    globalStat = {'H': (1, 12, 9)}
-    updateStat("Lucas", 1, 8)
+#    globalStat = {'H': (1, 12, 9)}
+#    updateStat("Lucas", 1, 8)
     mainMenu()
 except(KeyboardInterrupt):
     print("\nWe hope to see you soon again")
