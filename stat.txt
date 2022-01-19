@@ -1,2 +1,0 @@
-Player Name  Game    Difficulty  Number of try   Date
-David	Memory	Hard	33	2022-01-16
