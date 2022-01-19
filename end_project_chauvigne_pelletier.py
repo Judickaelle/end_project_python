@@ -192,18 +192,18 @@ class Memory:
 
         while True:
             try:
-                print("\nWith how many cards do you want to play ? (min : 8, max: 32, even number)")
+                print("\nWith how many pairs do you want to play ? (min : 4, max: 16, even number if hard mode)")
                 self._nCard = int(input())
 
                 # Verification of the value
-                if self._nCard < 8 or self._nCard > 32 or self._nCard % (self._difficulty*2) != 0:
-                    print("\nPlease enter an even value between 8 and 32")
+                if self._nCard < 4 or self._nCard > 16 or self._nCard % (self._difficulty) != 0:
+                    print("\nPlease enter an even value between 4 and 16")
                 else:
-                    return int(self._nCard)
+                    return 2*int(self._nCard)
 
             # if not a number
             except ValueError:
-                print("\nPlease enter an even value between 8 and 32")
+                print("\nPlease enter an even value between 4 and 16")
 
     # Select a card
     def InputCard(self):
@@ -347,10 +347,10 @@ class Memory:
 
 
                 playerName = input("\nPlease enter your name to save your result : ")
-                saveMemoryGame(playerName, self._difficultyName, self._try) 
+                saveMemoryGame(playerName, self._difficultyName, int(self._nCard/2),self._try)
                 ###############################################
                 # Ajouter le numbre de paire dans les données
-                ############################################
+                ###############################################
                 mainMenu()
 
 
