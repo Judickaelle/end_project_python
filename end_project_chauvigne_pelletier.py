@@ -9,6 +9,13 @@ import random
 import json
 
 # -----------------------------------------------------
+#                   GLOBAL VARIABLE 
+# -----------------------------------------------------
+
+press_enter = ("\nPress Enter to continue")
+dash = '-' * 60
+
+# -----------------------------------------------------
 #                      CLASS
 # -----------------------------------------------------
 
@@ -93,7 +100,7 @@ class Memory:
         self._try = 0;
 
     def memoryMenu(self):
-        print("\n--------------♥♠♦♣ Memory menu ♥♠♦♣---------------")
+        print("\n{:-^60}".format(" ♥♠♦♣ Memory menu ♥♠♦♣ "))
         self._choice = int(self.typeCardChoice())  # Choice of the type of card
         self._difficulty = self.difficultyChoice()
         self._nCard = self.numberOfCardChoice()  # Choice of the number of cards
@@ -333,10 +340,10 @@ class Memory:
             # Check if all pair are found
 
             if (self._pairFound == (self._nCard / 2)):
-                print("\n\n==============================================")
-                print("            Congratulation !")
-                print("            You won with " + str(self._try) + " try")
-                print("==============================================")
+                print(dash)
+                print("{: ^60}".format("Congratulation !"))
+                print("{: ^60}".format("You won with " + str(self._try) + " try"))
+                print(dash)
 
                 playerName = input("\nPlease enter your name to save your result : ")
                 saveMemoryGame(playerName, self._difficultyName, int(self._nCard/2),self._try)
@@ -348,7 +355,7 @@ class Memory:
 
 # ----------------- mainMenu function-------------------
 def mainMenu():
-    print("\n-------------------   Main menu   -------------------")
+    print("\n{:-^60}".format(" Main menu "))
     valideChoice = False
     # the user will be asked to choose what he wants to do
     while (not valideChoice):
@@ -382,7 +389,7 @@ def mainMenu():
 
 #-----------------   Statistic menu   -----------------
 def statisticMenu():
-    print("\n-----------------   Statistic menu   -----------------")     
+    print("\n{:-^60}".format(" Statistic menu "))     
     valideChoice = False
     # the user will be asked to choose what memory game he wants to play
     while (not valideChoice):
@@ -405,7 +412,7 @@ def statisticMenu():
             print("\n Memory best score")
             # to implement ############################################################
             readStatisticFile()
-            input("\nPress Enter to continue")
+            input(press_enter)
             statisticMenu()
         case 2:
             playerName = input("\n(Case SenSiTive !) Please enter your name : ")
@@ -524,14 +531,30 @@ def getPlayerStat(playerName):
     except(FileNotFoundError):                      #if the file does not exist
         print("\nPlease play at least one time to have record")
     
-    try:
-        print(playerRecord[playerName])
-        input("\nPress Enter to continue")
-    except(KeyError):
+    list_player_record = []
+    header = ["Game", "Difficulty", "Pairs number", "Score", "Date"]
+    list_player_record.append(header)
+    print(len(list_player_record), list_player_record)
+    list_player_record.append(playerRecord.get(playerName))
+    print(len(list_player_record), list_player_record)
+
+    list_player_record = playerRecord.get(playerName)
+    if list_player_record != None:
+        print("{: ^15} {: ^15} {: ^15} {: ^15} {: ^15}")
+        for item in list_player_record:
+             print("{: ^15} {: ^15} {: ^15} {: ^15} {: ^15}".format(*item))
+        input(press_enter)
+    else:
         print("\nThere is no record for this player\nHere are the folowwing player in the database :\n")
         for key in playerRecord.keys():
             print(key)
-        input("\nPress Enter to continue")
+        input(press_enter)
+        
+
+        
+    
+#    except:
+#        print("\n*********** An error occurs **********")
     return
 
                                   
@@ -541,9 +564,9 @@ def getPlayerStat(playerName):
 # -----------------------------------------------------
 
 try:
-    print("-----------------------------------------------------\n\
-                    WELCOMME GAMER\n\
------------------------------------------------------")
+    print(dash)
+    print("{: ^60}".format("WELCOMME GAMER"))
+    print(dash)
     mainMenu()
 except(KeyboardInterrupt):
     print("\nWe hope to see you soon again")
