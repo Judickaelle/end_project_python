@@ -3,7 +3,6 @@
 #                        IMPORT 
 # -----------------------------------------------------
 from pathlib import Path
-from dfr import DataFileReader   # get access to data file reader
 from datetime import date
 import time
 import random
@@ -46,9 +45,6 @@ class DeckCard(Card):
 
     def GetCouleur(self):
         return self._color
-
-
-
 
 # --------------- Deck of LetterCards ---------------
 class LetterCard(Card):
@@ -98,7 +94,6 @@ class Memory:
 
     def memoryMenu(self):
         print("\n--------------♥♠♦♣ Memory menu ♥♠♦♣---------------")
-
         self._choice = int(self.typeCardChoice())  # Choice of the type of card
         self._difficulty = self.difficultyChoice()
         self._nCard = self.numberOfCardChoice()  # Choice of the number of cards
@@ -107,7 +102,6 @@ class Memory:
         self.Game()  # Start the game
 
     def CreationTab(self):
-
         # Creation of the deck
         if self._choice == 1:
             for i in range(0, self._nCard):
@@ -153,7 +147,6 @@ class Memory:
                 print("\nPlease enter 1 or 2")
 
     def typeCardChoice(self):
-
         valideChoice = False
         # the user will be asked to choose what memory game he wants to play
         while (not valideChoice):
@@ -345,20 +338,13 @@ class Memory:
                 print("            You won with " + str(self._try) + " try")
                 print("==============================================")
 
-
                 playerName = input("\nPlease enter your name to save your result : ")
                 saveMemoryGame(playerName, self._difficultyName, int(self._nCard/2),self._try)
-                ###############################################
-                # Ajouter le numbre de paire dans les données
-                ###############################################
                 mainMenu()
-
-
 
 # -----------------------------------------------------
 #                      FUNCTIONS
 # -----------------------------------------------------
-
 
 # ----------------- mainMenu function-------------------
 def mainMenu():
@@ -412,7 +398,7 @@ def statisticMenu():
                 print("\nThe item you choosen does not exist")
                 time.sleep(1)
         except(ValueError):
-            print("\n***********An error occurs, please make another choice**********")
+            print("\n*********** An error occurs, please make another choice **********")
             time.sleep(1)
     match statisticMenuChoice:
         case 1:
@@ -422,7 +408,9 @@ def statisticMenu():
             input("\nPress Enter to continue")
             statisticMenu()
         case 2:
-            input("\nPlease enter your name")
+            playerName = input("\n(Case SenSiTive !) Please enter your name : ")
+            getPlayerStat(playerName)
+            statisticMenu()
             # to implement ############################################################
         case 3:
             mainMenu()
@@ -436,15 +424,6 @@ def statisticMenu():
 
 # -------------------- Save game function ----------------------
 def saveMemoryGame(playerName, difficulty, pairsNumber, score):
-#    my_filepath = Path("stat.txt")
-#    if not my_filepath.is_file():   #create a file with the following geader if it does not exist
-#        my_file = open("stat.txt", "a+")
-#        my_file.write("Player Name  Game    Difficulty  Number of try   Date\n")
-#        print("\nThe file stat.txt has been created")
-#        my_file.close
-
-#    my_file = open("stat.txt", "a") #opening of the file
-
     game = "Memory"
 
     try:        
@@ -461,7 +440,6 @@ def saveMemoryGame(playerName, difficulty, pairsNumber, score):
     today = date.today()                                            #get the date of today
     new_player_record = (game, difficulty, pairsNumber, score, str(today))       #the new tuple to register
     new_game_record = (playerName, difficulty, pairsNumber, score, str(today))
-
 
     #store the data with the player name as key
     playerData = playersRecord.get(playerName)                      #get the data from the player name
@@ -492,11 +470,6 @@ def saveMemoryGame(playerName, difficulty, pairsNumber, score):
     gameStat_file = open("gameStat.json", "w")                      #open the file to overwrite it
     json.dump(gameRecord, gameStat_file)                            #parse the data to json
     gameStat_file.close()                                           #close the file
-
-
-#    addtofile = playerName+"\t"+game+"\t"+difficulty+"\t"+str(score)+"\t"+str(today)+"\n"
-#    my_file.write(addtofile) 
-#    my_file.close
 
     print("\nThe game has been successfully saved !")
 
@@ -530,9 +503,8 @@ def saveMemoryGame(playerName, difficulty, pairsNumber, score):
 
 # ---------------- Read statistic file function ------------------
 def readStatisticFile():
-#    dfr = DataFileReader("stat.txt", sep="\t", header=True)
     try:        
-        a_file = open("playersStat.json", "r")             #opening the file
+        a_file = open("playersStat.json", "r")      #opening the file
         gameRecord = json.loads(a_file.read())      #getting the data from the file and storing them into a dictionary
         a_file.close()                              #closing the file
     except(FileNotFoundError):                      #if the file does not exist
@@ -541,17 +513,28 @@ def readStatisticFile():
         mainMenu()    
 
     print("*****************************************")
-    print(gameRecord)                             
+    print(gameRecord)
+
+# ---------------- Get player statistic function ------------------
+def getPlayerStat(playerName):
+    try:        
+        a_file = open("playersStat.json", "r")      #opening the file
+        playerRecord = json.loads(a_file.read())      #getting the data from the file and storing them into a dictionary
+        a_file.close()                              #closing the file
+    except(FileNotFoundError):                      #if the file does not exist
+        print("\nPlease play at least one time to have record")
     
-#    i=0
-#    while True:
+    try:
+        print(playerRecord[playerName])
+        input("\nPress Enter to continue")
+    except(KeyError):
+        print("\nThere is no record for this player\nHere are the folowwing player in the database :\n")
+        for key in playerRecord.keys():
+            print(key)
+        input("\nPress Enter to continue")
+    return
 
-#        content = dfr.get_data()
-#        if (content == None):
-#            break     # reached EndOfFile
-
-#        print(i,":   ",content)
-#        i=i+1
+                                  
 
 # -----------------------------------------------------
 #                          MAIN
@@ -561,8 +544,6 @@ try:
     print("-----------------------------------------------------\n\
                     WELCOMME GAMER\n\
 -----------------------------------------------------")
-#    globalStat = {'H': (1, 12, 9)}
-#    updateStat("Lucas", 1, 8)
     mainMenu()
 except(KeyboardInterrupt):
     print("\nWe hope to see you soon again")
