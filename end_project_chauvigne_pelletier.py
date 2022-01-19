@@ -403,7 +403,7 @@ def statisticMenu():
         try:
             statisticMenuChoice = int(input("\nPlease choose a valid item : \
                     \n1- Memory 10 best score\
-                    \n2- Player best score\
+                    \n2- Your statistics\
                     \n3- Go back\
                     \n4- Quit\
                     \n\nPlease enter your choice number : "))
@@ -419,10 +419,10 @@ def statisticMenu():
             print("\n Memory best score")
             # to implement ############################################################
             readStatisticFile()
-            input("Press Enter to continue")
+            input("\nPress Enter to continue")
             statisticMenu()
         case 2:
-            print("\nPlayer best score")
+            input("\nPlease enter your name")
             # to implement ############################################################
         case 3:
             mainMenu()
