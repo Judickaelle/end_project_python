@@ -169,7 +169,7 @@ class Memory:
                     print("\nThe item you choosen does not exist")
                     time.sleep(1)
             except(ValueError):
-                print("\n***********An error occurs, please make another choice**********")
+                print("\n{:*^60}".format(" An error occurs, please make another choice "))
                 time.sleep(1)
         match memoryMenuChoice:
             case 1:
@@ -370,7 +370,7 @@ def mainMenu():
                 print("\nThe item you choosen does not exist")
                 time.sleep(1)
         except(ValueError):
-            print("\n***********An error occurs, please make another choice**********")
+            print("\n{:*^60}".format(" An error occurs, please make another choice "))
             time.sleep(1)
     # according to the user answer the programm continue running
     match mainMenuChoice:
@@ -405,7 +405,7 @@ def statisticMenu():
                 print("\nThe item you choosen does not exist")
                 time.sleep(1)
         except(ValueError):
-            print("\n*********** An error occurs, please make another choice **********")
+            print("\n{:*^60}".format(" An error occurs, please make another choice "))
             time.sleep(1)
     match statisticMenuChoice:
         case 1:
@@ -519,7 +519,7 @@ def readStatisticFile():
         time.sleep(1)
         mainMenu()    
 
-    print("*****************************************")
+    print(dash)
     print(gameRecord)
 
 # ---------------- Get player statistic function ------------------
@@ -530,19 +530,14 @@ def getPlayerStat(playerName):
         a_file.close()                              #closing the file
     except(FileNotFoundError):                      #if the file does not exist
         print("\nPlease play at least one time to have record")
-    
-    list_player_record = []
-    header = ["Game", "Difficulty", "Pairs number", "Score", "Date"]
-    list_player_record.append(header)
-    print(len(list_player_record), list_player_record)
-    list_player_record.append(playerRecord.get(playerName))
-    print(len(list_player_record), list_player_record)
 
     list_player_record = playerRecord.get(playerName)
     if list_player_record != None:
-        print("{: ^15} {: ^15} {: ^15} {: ^15} {: ^15}")
+        print(dash + "-" * 8)
+        print("{: ^15} {: ^15} {: ^12} {: ^10} {: ^15}".format("GAME", "DIFFICULTY", "PAIRS NUMBER", "SCORE", "DATE"))
+        print(dash + "-" * 8)
         for item in list_player_record:
-             print("{: ^15} {: ^15} {: ^15} {: ^15} {: ^15}".format(*item))
+             print("{: ^15} {: ^15} {: ^12} {: ^10} {: ^15}".format(*item))
         input(press_enter)
     else:
         print("\nThere is no record for this player\nHere are the folowwing player in the database :\n")
