@@ -9,7 +9,6 @@ Two levels of difficulty will be available: Normal and Hard. For the normal one,
 At the end of each game, the number of try will be printed. Each game will also be saved in an external .txt file. For each line of this file will be written:
     The name of the player
     the date the game was played
-    Type of card (Letters or Card Game)
     The difficulty
     The number of try
 

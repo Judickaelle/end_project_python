@@ -2,6 +2,7 @@
 # -----------------------------------------------------
 #                        IMPORT 
 # -----------------------------------------------------
+from operator import itemgetter
 from pathlib import Path
 from datetime import date
 import time
@@ -418,7 +419,6 @@ def statisticMenu():
             playerName = input("\n(Case SenSiTive !) Please enter your name : ")
             getPlayerStat(playerName)
             statisticMenu()
-            # to implement ############################################################
         case 3:
             mainMenu()
         case 4:
@@ -480,38 +480,11 @@ def saveMemoryGame(playerName, difficulty, pairsNumber, score):
 
     print("\nThe game has been successfully saved !")
 
-#	The name of the player
-#	The number of games played
-#	The average of try per difficulty
-#	The best score per difficulty
-
-#def updateStat(playerName, difficulty, ntry):
-#    value = []
-#    if playerName in globalStat:
-#        d = globalStat[playerName]
-#        i = 0
-#        if d is not None:
-#            for v in d:
-#                value.append(int(v))
-#                i += 1
-#
-#            # Average of try
-#            value[1] = (value[1]*value[0] + ntry)/(value[0]+1)
-#
-#            # Best score
-#            if ntry < value[2]:
-#                value[2] = ntry
-#
-#            # Number of games played
-#            value[0] += 1
-#    else:
-#        globalStat[playerName] = (1, ntry, ntry)
-#    print(value)
 
 # ---------------- Read statistic file function ------------------
 def readStatisticFile():
     try:        
-        a_file = open("playersStat.json", "r")      #opening the file
+        a_file = open("gameStat.json", "r")         #opening the file
         gameRecord = json.loads(a_file.read())      #getting the data from the file and storing them into a dictionary
         a_file.close()                              #closing the file
     except(FileNotFoundError):                      #if the file does not exist
@@ -522,37 +495,90 @@ def readStatisticFile():
     print(dash)
     print(gameRecord)
 
-# ---------------- Get player statistic function ------------------
+# ------------ Get player statistic function --------------
 def getPlayerStat(playerName):
     try:        
-        a_file = open("playersStat.json", "r")      #opening the file
-        playerRecord = json.loads(a_file.read())      #getting the data from the file and storing them into a dictionary
-        a_file.close()                              #closing the file
-    except(FileNotFoundError):                      #if the file does not exist
+        a_file = open("playersStat.json", "r")          #opening the file
+        playerRecord = json.loads(a_file.read())        #getting the data from the file and storing them into a dictionary
+        a_file.close()                                  #closing the file
+    except(FileNotFoundError):                          #if the file does not exist
         print("\nPlease play at least one time to have record")
 
     list_player_record = playerRecord.get(playerName)
-    if list_player_record != None:
-        print(dash + "-" * 8)
-        print("{: ^15} {: ^15} {: ^12} {: ^10} {: ^15}".format("GAME", "DIFFICULTY", "PAIRS NUMBER", "SCORE", "DATE"))
-        print(dash + "-" * 8)
-        for item in list_player_record:
-             print("{: ^15} {: ^15} {: ^12} {: ^10} {: ^15}".format(*item))
-        input(press_enter)
+    if list_player_record != None:                      #if the list is not empty
+        previous_game = ""                              #at the begining the variables are empty
+        current_game = ""
+        i=0
+        list_of_game = []
+        while i < len(list_player_record):              #here we want to collect all the different game that the player may have played
+            for item in list_player_record:
+                current_game = item[0]
+                if current_game != previous_game:
+                    list_of_game.append(current_game)
+                previous_game = current_game
+                i=i+1
+            list_of_game = remove_duplicate(list_of_game)           # we keep only once each game      
+        for game in list_of_game:
+            if game == "Memory":
+                record_by_game = filter_list(list_player_record, game, "Normal")
+                print_record(record_by_game)
+                print_total_average(record_by_game)
+                record_by_game = filter_list(list_player_record, game, "Hard")
+                print_record(record_by_game)
+                print_total_average(record_by_game)
+            else:
+                record_by_game = filter_list(list_player_record, game)
+                print_record(record_by_game)
+                print_total_average(record_by_game)        
     else:
         print("\nThere is no record for this player\nHere are the folowwing player in the database :\n")
-        for key in playerRecord.keys():
-            print(key)
+        print(*playerRecord.keys(), sep = ",")          # printing the list using * and sep operator
         input(press_enter)
-        
-
-        
-    
-#    except:
-#        print("\n*********** An error occurs **********")
     return
 
-                                  
+# ------------ filter a list by given arg --------------
+def filter_list(list, game, *args):
+    # the list will be filtered according the different parameter selected
+    # a list of record will be retrun
+    new_list = [item for item in list if item[0] == game]
+    for ar in args:
+        new_list = [item for item in list if item[0] == game and item[1] == ar]
+    new_list.sort(key=lambda y: y[3])                               # sorts the list ascending by the score
+    return new_list    
+
+# ---------- remove duplicate inside a list ------------
+def remove_duplicate(my_list):
+    #remove duplicate inside a list vy transforming it into a dictionary and then convert it 
+    # againt into a list
+    return list(dict.fromkeys(my_list))   
+
+# ----------------- print the record ------------------
+def print_record(list): 
+    print(dash + "-" * 8)
+    print("{: ^15} {: ^15} {: ^12} {: ^10} {: ^15}".format("GAME", "DIFFICULTY", "PAIRS NUMBER", "SCORE", "DATE"))
+    print(dash + "-" * 8)
+    for item in list:
+        print("{: ^15} {: ^15} {: ^12} {: ^10} {: ^15}".format(*item))
+    return
+
+# -------------- print total and average ---------------
+def print_total_average(list):
+    sum_score = 0
+    best_score = 1000
+    for item in list:
+        sum_score = sum_score + item[3]
+        if item[3] < best_score:
+            best_score = item[3]
+    average = (sum_score/len(list))
+    print(dash + "-" * 8)
+    print("Played : ", len(list), ("time", "times")[len(list)>1])
+    print("Average = ", average)
+    print("Best score = ", best_score)
+    print()
+    input(press_enter)
+    print()
+    return
+                  
 
 # -----------------------------------------------------
 #                          MAIN
