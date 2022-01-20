@@ -327,6 +327,7 @@ class Memory:
                     self._tabCard[self._select].SetFind(1)
                     self._tabCard[self._select2].SetFind(1)
                     self._pairFound += 1
+                    print('\n Well done !!')
 
             # Check if quadriple
             if self._difficulty == 2:
@@ -338,6 +339,7 @@ class Memory:
                     self._tabCard[self._select3].SetFind(1)
                     self._tabCard[self._select4].SetFind(1)
                     self._pairFound += 2
+                    print('\n Well done !!')
             # Check if all pair are found
 
             if (self._pairFound == (self._nCard / 2)):
