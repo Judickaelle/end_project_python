@@ -2,8 +2,6 @@
 # -----------------------------------------------------
 #                        IMPORT 
 # -----------------------------------------------------
-from operator import itemgetter
-from pathlib import Path
 from datetime import date
 import time
 import random
@@ -12,14 +10,12 @@ import json
 # -----------------------------------------------------
 #                   GLOBAL VARIABLE 
 # -----------------------------------------------------
-
 press_enter = ("\nPress Enter to continue")
 dash = '-' * 60
 
 # -----------------------------------------------------
 #                      CLASS
 # -----------------------------------------------------
-
 # ----------------   CLASS FOR MEMORY  ----------------
 # ----------------------- Cards -----------------------
 class Card:
@@ -66,9 +62,7 @@ class LetterCard(Card):
 # ------------------ Memory ------------------
 class Memory:
     def __init__(self):
-
         # Table of cards
-        
         self._tabCardDeck = (" 1♥ ", " 1♠ ", " 1♦ ", " 1♣ ", " 7♥ ", " 7♦ ",
                              " 7♠ ", " 7♣ ", " 8♥ ", " 8♦ ", " 8♠ ", " 8♣ ",
                              " 9♥ ", " 9♦ ", " 9♠ ", " 9♣ ", "10♥ ", "10♦ ",
@@ -114,7 +108,6 @@ class Memory:
         if self._choice == 1:
             for i in range(0, self._nCard):
                 self._tabCard.append(DeckCard(self._tabCardDeck[i]));
-
         if self._choice == 2:
             if self._difficulty == 1:
                 for i in range(0, self._nCard):
@@ -136,9 +129,7 @@ class Memory:
             try:
                 print("\nwith what difficulty do you want to play ? (1: Normal, 2: Hard):")
                 self._difficulty = int(input())
-
-                # Verification of the value
-                if self._difficulty != 1 and self._difficulty != 2:
+                if self._difficulty != 1 and self._difficulty != 2:                     # Verification of the value
                     print("\nPlease enter 1 or 2")
                 else:
                     if self._difficulty == 1:
@@ -149,9 +140,7 @@ class Memory:
                         print("\nDifficulty hard : you need to find quadruple")
                         self._difficultyName = "Hard"
                         return int(self._difficulty)
-
-            # if not a number
-            except ValueError:
+            except ValueError:                                                              # if not a number
                 print("\nPlease enter 1 or 2")
 
     def typeCardChoice(self):
@@ -187,61 +176,45 @@ class Memory:
                 quit()
             case _:
                 print("\nDidn't match a case")
-
-    # Choose of the number of cards
-    def numberOfCardChoice(self):
+    
+    def numberOfCardChoice(self):                                                                   # Choose of the number of cards
         while True:
             try:
                 print("\nWith how many pairs do you want to play ? (min : 4, max: 16, even number if hard mode)")
                 self._nCard = int(input())
-
-                # Verification of the value
-                if self._nCard < 4 or self._nCard > 16 or self._nCard % (self._difficulty) != 0:
+                if self._nCard < 4 or self._nCard > 16 or self._nCard % (self._difficulty) != 0:    # Verification of the value
                     print("\nPlease enter an even value between 4 and 16")
                 else:
-                    return 2*int(self._nCard)
-
-            # if not a number
-            except ValueError:
+                    return 2*int(self._nCard)  
+            except ValueError:                                                                      # if not a number
                 print("\nPlease enter an even value between 4 and 16")
 
-    # Select a card
-    def InputCard(self):
+    def InputCard(self):                                                                            # Select a card
         while True:
             try:
                 print("Enter card number (-1 to exit)", end=" : ")
                 select = int(input())
-
-                # Verification of the value
-                if select >= -1 and select < self._nCard and self._tabCard[select].GetFind() == 0:
+                if select >= -1 and select < self._nCard and self._tabCard[select].GetFind() == 0:   # Verification of the value
                     return select
                 else:
                     print("incorrect value")
-
-            # if not a number
-            except ValueError:
+            except ValueError:                                                                      # if not a number
                 print("the number must be between 0 and " + str(self._nCard))
 
     # Display cards function
     def Display(self):
         for i in range(0, self._nCard):
-
-            # Add 0 before small number
-            if (i < 10):
+            if (i < 10):                                    # Add 0 before small number
                 print("0", end='')
-
             # print symbol if selected
             if (i == self._select or i == self._select2 or i == self._select3 or i == self._select4):
                 print(str(i) + "[" + self._tabCard[i].GetSymbol() + "] ", end=' ')
-
             # print symbol if pair already found
             elif (self._tabCard[i].GetFind() == 1):
                 print(str(i) + "[" + self._tabCard[i].GetSymbol() + "] ", end=' ')
-
             # Else hide symbol
             else:
                 print(str(i) + "[****] ", end=' ')
-
             # line break every 4 displays
             if ((i + 1) % 4 == 0 and i != 0):
                 print()
@@ -254,12 +227,10 @@ class Memory:
             self._select2 = None
             self._select3 = None
             self._select4 = None
-
             self._ended = False
 
             print("CARD N°1 :")
             self._select = self.InputCard()  # input first card
-
             if (self._select == -1):  # exit if -1
                 break;
 
@@ -267,16 +238,13 @@ class Memory:
 
             print("\n")
             print("CARD N°2 :")
-
             while (True):
                 self._select2 = self.InputCard()  # input second card
-
                 # verify input
                 if self._select2 != self._select:
                     break;
                 else:
                     print("please select two different cards")
-
             if (self._select2 == -1):  # exit if -1
                 break;
 
@@ -285,16 +253,13 @@ class Memory:
             if self._difficulty == 2:
                 print("\n")
                 print("CARD N°3 :")
-
                 while (True):
                     self._select3 = self.InputCard()  # input second card
-
                     # verify input
                     if self._select3 != self._select and self._select3 != self._select2:
                         break;
                     else:
                         print("please select two different cards")
-
                 if (self._select3 == -1):  # exit if -1
                     break;
 
@@ -302,19 +267,15 @@ class Memory:
 
                 print("\n")
                 print("CARD N°4 :")
-
                 while (True):
                     self._select4 = self.InputCard()  # input second card
-
                     # verify input
                     if self._select4 != self._select and self._select4 != self._select2 and self._select4 != self._select3 :
                         break;
                     else:
                         print("please select two different cards")
-
                 if (self._select4 == -1):  # exit if -1
                     break;
-
                 self.Display()  # Display table
 
             self._try += 1;  # count number of try
@@ -339,8 +300,8 @@ class Memory:
                     self._tabCard[self._select4].SetFind(1)
                     self._pairFound += 2
                     print('\n Well done !!')
+            
             # Check if all pair are found
-
             if (self._pairFound == (self._nCard / 2)):
                 print(dash)
                 print("{: ^60}".format("Congratulation !"))
@@ -424,11 +385,9 @@ def statisticMenu():
         case _:
             print("\nDidn't match a case")       
 
-
 # -------------------- Save game function ----------------------
 def saveMemoryGame(playerName, difficulty, pairsNumber, score):
     game = "Memory"
-
     try:        
         playersStat_file = open("playersStat.json", "r")            #opening the file
         gameStat_file = open("gameStat.json", "r")
@@ -475,7 +434,6 @@ def saveMemoryGame(playerName, difficulty, pairsNumber, score):
     gameStat_file.close()                                           #close the file
 
     print("\nThe game has been successfully saved !")
-
 
 # ---------------- Get Memory statistic function ------------------
 def getMemoryStat():
