@@ -190,7 +190,6 @@ class Memory:
 
     # Choose of the number of cards
     def numberOfCardChoice(self):
-
         while True:
             try:
                 print("\nWith how many pairs do you want to play ? (min : 4, max: 16, even number if hard mode)")
@@ -355,8 +354,7 @@ class Memory:
 # -----------------------------------------------------
 #                      FUNCTIONS
 # -----------------------------------------------------
-
-# ----------------- mainMenu function-------------------
+# ----------------- mainMenu function------------------
 def mainMenu():
     print("\n{:-^60}".format(" Main menu "))
     valideChoice = False
@@ -389,7 +387,6 @@ def mainMenu():
         case _:
             print("\nDidn't match a case")
             
-
 #-----------------   Statistic menu   -----------------
 def statisticMenu():
     print("\n{:-^60}".format(" Statistic menu "))     
@@ -398,7 +395,7 @@ def statisticMenu():
     while (not valideChoice):
         try:
             statisticMenuChoice = int(input("\nPlease choose a valid item : \
-                    \n1- Memory 10 best score\
+                    \n1- Memory best score\
                     \n2- Your statistics\
                     \n3- Go back\
                     \n4- Quit\
@@ -412,10 +409,7 @@ def statisticMenu():
             time.sleep(1)
     match statisticMenuChoice:
         case 1:
-            print("\n Memory best score")
-            # to implement ############################################################
-            readStatisticFile()
-            input(press_enter)
+            getMemoryStat()
             statisticMenu()
         case 2:
             playerName = input("\n(Case SenSiTive !) Please enter your name : ")
@@ -483,8 +477,8 @@ def saveMemoryGame(playerName, difficulty, pairsNumber, score):
     print("\nThe game has been successfully saved !")
 
 
-# ---------------- Read statistic file function ------------------
-def readStatisticFile():
+# ---------------- Get Memory statistic function ------------------
+def getMemoryStat():
     try:        
         a_file = open("gameStat.json", "r")         #opening the file
         gameRecord = json.loads(a_file.read())      #getting the data from the file and storing them into a dictionary
@@ -494,8 +488,12 @@ def readStatisticFile():
         time.sleep(1)
         mainMenu()    
 
-    print(dash)
-    print(gameRecord)
+    gameRecord = gameRecord.get("Memory")           #update the list to keep only Memory record
+    gameRecord_normalLevel = print_memory_records(gameRecord, "Normal")
+    print_total_average(gameRecord_normalLevel)
+    gameRecord_hardLevel = print_memory_records(gameRecord, "Hard")
+    print_total_average(gameRecord_hardLevel)
+    return
 
 # ------------ Get player statistic function --------------
 def getPlayerStat(playerName):
@@ -505,6 +503,8 @@ def getPlayerStat(playerName):
         a_file.close()                                  #closing the file
     except(FileNotFoundError):                          #if the file does not exist
         print("\nPlease play at least one time to have record")
+        time.sleep(1)
+        mainMenu()
 
     list_player_record = playerRecord.get(playerName)
     if list_player_record != None:                      #if the list is not empty
@@ -512,7 +512,8 @@ def getPlayerStat(playerName):
         current_game = ""
         i=0
         list_of_game = []
-        while i < len(list_player_record):              #here we want to collect all the different game that the player may have played
+        #here we want to collect all the different game that the player may have played
+        while i < len(list_player_record):              
             for item in list_player_record:
                 current_game = item[0]
                 if current_game != previous_game:
@@ -523,14 +524,14 @@ def getPlayerStat(playerName):
         for game in list_of_game:
             if game == "Memory":
                 record_by_game = filter_list(list_player_record, game, "Normal")
-                print_record(record_by_game)
+                print_player_records(record_by_game)
                 print_total_average(record_by_game)
                 record_by_game = filter_list(list_player_record, game, "Hard")
-                print_record(record_by_game)
+                print_player_records(record_by_game)
                 print_total_average(record_by_game)
             else:
                 record_by_game = filter_list(list_player_record, game)
-                print_record(record_by_game)
+                print_player_records(record_by_game)
                 print_total_average(record_by_game)        
     else:
         print("\nThere is no record for this player\nHere are the folowwing player in the database :\n")
@@ -545,23 +546,57 @@ def filter_list(list, game, *args):
     new_list = [item for item in list if item[0] == game]
     for ar in args:
         new_list = [item for item in list if item[0] == game and item[1] == ar]
-    new_list.sort(key=lambda y: y[3])                               # sorts the list ascending by the score
-    return new_list    
+    # the list will be sorted first by the number of pairs and then by the score
+    new_list.sort(key=lambda y: y[2])                                       # sorts the list ascending by the pair number
+    
+    number_pair_list = remove_duplicate([item[2] for item in new_list])     # get all the different pair number    
+
+    # for each pair_number, a new_sub_list is created, filtered by the score and then adding to the final list
+    final_filter_list = []
+    for pair_number in number_pair_list:
+        new_sub_list = [item for item in new_list if item[2] == pair_number]
+        new_sub_list.sort(key=lambda y: y[3])                               # sorts the list ascending by the score
+        final_filter_list.extend(new_sub_list)                              # add elements from one list to another list
+    
+    return final_filter_list    
 
 # ---------- remove duplicate inside a list ------------
 def remove_duplicate(my_list):
-    #remove duplicate inside a list vy transforming it into a dictionary and then convert it 
+    # remove duplicate inside a list by transforming it into a dictionary and then convert it 
     # againt into a list
     return list(dict.fromkeys(my_list))   
 
-# ----------------- print the record ------------------
-def print_record(list): 
+# ----------------- print player records ------------------
+def print_player_records(list): 
     print(dash + "-" * 8)
     print("{: ^15} {: ^15} {: ^12} {: ^10} {: ^15}".format("GAME", "DIFFICULTY", "PAIRS NUMBER", "SCORE", "DATE"))
     print(dash + "-" * 8)
     for item in list:
         print("{: ^15} {: ^15} {: ^12} {: ^10} {: ^15}".format(*item))
     return
+
+# ----------------- print Memory records ------------------
+def print_memory_records(list, difficulty):
+    print(dash)
+    print("{: ^60}".format("MEMORY - LEVEL : " + difficulty)) 
+    print(dash)
+    print("{: ^20} {: ^15} {: ^10} {: ^15}".format("PLAYER NAME", "PAIRS NUMBER", "SCORE", "DATE"))
+    print(dash)
+    new_list = [item for item in list if item[1] == difficulty]
+     # the list will be sorted first by the number of pairs and then by the score
+    new_list.sort(key=lambda y: y[2])                                       # sorts the list ascending by the pair number
+    
+    number_pair_list = remove_duplicate([item[2] for item in new_list])     # get all the different pair number    
+
+    # for each pair_number, a new_sub_list is created, filtered by the score and then adding to the final list
+    final_filter_list = []
+    for pair_number in number_pair_list:
+        new_sub_list = [item for item in new_list if item[2] == pair_number]
+        new_sub_list.sort(key=lambda y: y[3])                               # sorts the list ascending by the score
+        final_filter_list.extend(new_sub_list)                              # add elements from one list to another list
+    for item in final_filter_list:
+        print("{: ^20} {: ^15} {: ^10} {: ^15}".format(item[0], item[2], item[3], item[4]))
+    return final_filter_list
 
 # -------------- print total and average ---------------
 def print_total_average(list):
@@ -581,11 +616,9 @@ def print_total_average(list):
     print()
     return
                   
-
 # -----------------------------------------------------
 #                          MAIN
 # -----------------------------------------------------
-
 try:
     print(dash)
     print("{: ^60}".format("WELCOMME GAMER"))
