@@ -482,18 +482,21 @@ def getPlayerStat(playerName):
         for game in list_of_game:
             if game == "Memory":
                 record_by_game = filter_list(list_player_record, game, "Normal")
-                print_player_records(record_by_game)
-                print_total_average(record_by_game)
+                if len(record_by_game) > 0:
+                    print_player_records(record_by_game)
+                    print_total_average(record_by_game)
                 record_by_game = filter_list(list_player_record, game, "Hard")
-                print_player_records(record_by_game)
-                print_total_average(record_by_game)
+                if len(record_by_game) > 0:
+                    print_player_records(record_by_game)
+                    print_total_average(record_by_game)
             else:
                 record_by_game = filter_list(list_player_record, game)
-                print_player_records(record_by_game)
-                print_total_average(record_by_game)        
+                if len(record_by_game) > 0:
+                    print_player_records(record_by_game)
+                    print_total_average(record_by_game)        
     else:
         print("\nThere is no record for this player\nHere are the folowwing player in the database :\n")
-        print(*playerRecord.keys(), sep = ",")          # printing the list using * and sep operator
+        print(*playerRecord.keys(), sep = ", ")          # printing the list using * and sep operator
         input(press_enter)
     return
 
