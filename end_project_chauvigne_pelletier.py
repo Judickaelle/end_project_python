@@ -447,10 +447,16 @@ def getMemoryStat():
         mainMenu()    
 
     gameRecord = gameRecord.get("Memory")           #update the list to keep only Memory record
-    gameRecord_normalLevel = print_memory_records(gameRecord, "Normal")
-    print_total_average(gameRecord_normalLevel)
-    gameRecord_hardLevel = print_memory_records(gameRecord, "Hard")
-    print_total_average(gameRecord_hardLevel)
+    try:
+        gameRecord_normalLevel = print_memory_records(gameRecord, "Normal")
+        print_total_average(gameRecord_normalLevel)
+    except(ZeroDivisionError):
+        print("no data\n")
+    try:
+        gameRecord_hardLevel = print_memory_records(gameRecord, "Hard")
+        print_total_average(gameRecord_hardLevel)
+    except(ZeroDivisionError):
+        print("no data\n")
     return
 
 # ------------ Get player statistic function --------------
